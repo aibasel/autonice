@@ -1,0 +1,26 @@
+* bugs/issues/RFEs
+
+I'm not sure how diligent I'll be in updating the status of fixed
+bugs etc., so the dates associated with each entry might be an
+indication of how likely a given entry is to be out of date. ;-)
+
+06.09.2017:
+- Setting the nice value causes a release of held jobs, so autonice
+  will automatically release all held jobs. (Reported by Silvan.)
+
+06.09.2017:
+- When using autonice, it is currently not possible to affect the
+  order of one's own job, e.g. to defer a job with naturally higher
+  priority in order to let another job of one's own past. One simple
+  but crude way to change this is to have autonice only affect jobs
+  whose nice value is identical to one of the two nice values that
+  autonice.
+
+06.09.2017:
+- It would be useful to gather statistics about grid usage, e.g. a
+  plot over time of who is using how many cores and who is waiting at
+  a given time, perhaps also adding data points that indicate at which
+  time each user performs an autonice iteration. Then we can hopefully
+  see how quickly and how successfully autonice manages to balance the
+  usage. By observing this for some time, we can perhaps also
+  determine reasonable values for the frequency at which autonice runs.
