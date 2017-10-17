@@ -6,11 +6,7 @@ HIGH_NICE_VALUE=1001
 LOW_NICE_VALUE=0
 TOTAL_CORES=384
 SLEEP_DURATION=300
-
-# Please *leave* this setting, i.e., don't adapt this to use your own
-# home directory or something similar. Note to self: make sure the
-# directory is group-writable.
-LOGDIR=/infai/helmert/tmp/autonice-test/log
+LOGFILE=~/autonice.log
 
 function my_squeue {
     squeue --partition infai --noheader "$@"
@@ -77,7 +73,6 @@ function main_loop {
 }
 
 USERNAME=$(whoami)
-LOGFILE="$LOGDIR/$USERNAME.log"
 
 if [ "$1" = "--silent" ]; then
     main_loop "$USERNAME" >> "$LOGFILE" 2>&1
@@ -85,13 +80,18 @@ else
     main_loop "$USERNAME" 2>&1 | tee -a "$LOGFILE"
 fi
 
-# You can start this in the background with:
+# Start `autonice` in the background with:
 #
-# nohup ./autonice_prototype.sh --silent &
+#     nohup ./autonice_prototype.sh --silent &
 #
-# This will leave behind an empty file called "nohup.out", which you
-# can safely delete. After starting the command, log out.
+# After running this command, log out.
 #
-# If you want to kill the script later, use
+# If you want to kill the script later, for example before a restart, use
 #
-# killall autonice_prototype.sh
+#     killall autonice_prototype.sh
+#
+# Running autonice under nohup leaves behind an empty file called
+# "nohup.out", which you can safely delete when autonice is not
+# running. (Deleting it while autonice is running is not dangerous,
+# but will likely lead to quirky behaviour.)
+
