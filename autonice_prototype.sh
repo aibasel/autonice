@@ -79,19 +79,3 @@ if [ "$1" = "--silent" ]; then
 else
     main_loop "$USERNAME" 2>&1 | tee -a "$LOGFILE"
 fi
-
-# Start `autonice` in the background with:
-#
-#     nohup ./autonice_prototype.sh --silent &
-#
-# After running this command, log out.
-#
-# If you want to kill the script later, for example before a restart, use
-#
-#     killall autonice_prototype.sh
-#
-# Running autonice under nohup leaves behind an empty file called
-# "nohup.out", which you can safely delete when autonice is not
-# running. (Deleting it while autonice is running is not dangerous,
-# but will likely lead to quirky behaviour.)
-
