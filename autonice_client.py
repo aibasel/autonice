@@ -121,4 +121,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    print("This is not the autonice you are looking for.")
+    print("This is work-in-progress code that doesn't do anything useful and ")
+    print("is not meant to be used at this stage.")
+    print("Please run autonice_prototype.sh instead.")
+    # main()
