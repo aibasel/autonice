@@ -83,7 +83,11 @@ def main():
     user = getpass.getuser()
     while True:
         print datetime.datetime.now()
-        update_jobs(user)
+        try:
+            update_jobs(user)
+        except subprocess.CalledProcessError as err:
+            # Log error and continue.
+            print "Error: {err}".format(**locals())
         print
         time.sleep(SLEEP_DURATION)
 
