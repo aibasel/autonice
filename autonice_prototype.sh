@@ -6,10 +6,14 @@ set -euo pipefail
 # points from job age.
 HIGH_NICE_VALUE=1001
 LOW_NICE_VALUE=0
-TOTAL_CORES=384
 SLEEP_DURATION=300
 PARTITION="$1"
 LOGFILE=~/autonice-$PARTITION.log
+
+function get_num_cores {
+    cpuinfo=$(sinfo --partition="$PARTITION" --noheader -o "%C")
+    basename "$cpuinfo"
+}
 
 function my_squeue {
     squeue --partition "$PARTITION" --noheader "$@"
@@ -47,6 +51,7 @@ function update_jobs {
     MY_CORES=$(running_jobs_for_user "$USERNAME")
     echo "I am running $MY_CORES tasks."
     echo "Hence, I assume I am using $MY_CORES cores."
+    TOTAL_CORES=$(get_num_cores)
     echo "Under normal circumstances, there should be $TOTAL_CORES cores."
     PENDING_USERS=$(pending_users)
     echo "There are $PENDING_USERS users with pending jobs."
