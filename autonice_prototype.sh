@@ -1,15 +1,18 @@
 #! /bin/bash
 
+set -eu
+
 # Set HIGH_NICE_VALUE high enough to counter-balance 1000 priority
 # points from job age.
 HIGH_NICE_VALUE=1001
 LOW_NICE_VALUE=0
 TOTAL_CORES=384
 SLEEP_DURATION=300
+PARTITION="$1"
 LOGFILE=~/autonice.log
 
 function my_squeue {
-    squeue --partition infai --noheader "$@"
+    squeue --partition "$PARTITION" --noheader "$@"
 }
 
 function running_jobs_for_user {
