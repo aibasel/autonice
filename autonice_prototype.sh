@@ -6,7 +6,6 @@ set -euo pipefail
 # points from job age.
 HIGH_NICE_VALUE=1001
 LOW_NICE_VALUE=0
-SLEEP_DURATION=300
 PARTITION="$1"
 LOGFILE=~/autonice-$PARTITION.log
 
@@ -76,6 +75,7 @@ function main_loop {
         date
         update_jobs "$USERNAME"
         echo
+        SLEEP_DURATION=$((RANDOM % 61 + 30))
         sleep $SLEEP_DURATION
     done
 }
