@@ -1,6 +1,6 @@
 #! /bin/bash
 
-set -euo pipefail
+set -u
 
 # Set HIGH_NICE_VALUE high enough to counter-balance 1000 priority
 # points from job age.
