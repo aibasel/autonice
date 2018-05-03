@@ -1,6 +1,6 @@
 #! /bin/bash
 
-set -eu
+set -euo pipefail
 
 # Set HIGH_NICE_VALUE high enough to counter-balance 1000 priority
 # points from job age.
@@ -9,7 +9,7 @@ LOW_NICE_VALUE=0
 TOTAL_CORES=384
 SLEEP_DURATION=300
 PARTITION="$1"
-LOGFILE=~/autonice.log
+LOGFILE=~/autonice-$PARTITION.log
 
 function my_squeue {
     squeue --partition "$PARTITION" --noheader "$@"
