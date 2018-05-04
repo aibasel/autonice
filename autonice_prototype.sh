@@ -1,15 +1,23 @@
 #! /bin/bash
 
+set -u
+
 # Set HIGH_NICE_VALUE high enough to counter-balance 1000 priority
 # points from job age.
 HIGH_NICE_VALUE=1001
 LOW_NICE_VALUE=0
-TOTAL_CORES=384
-SLEEP_DURATION=300
-LOGFILE=~/autonice.log
+PARTITION="$1"
+LOGFILE=~/autonice-$PARTITION.log
+
+function get_num_cores {
+    cpuinfo=$(sinfo --partition="$PARTITION" --noheader -o "%C")
+    basename "$cpuinfo"
+}
+
+TOTAL_CORES=$(get_num_cores)
 
 function my_squeue {
-    squeue --partition infai --noheader "$@"
+    squeue --partition "$PARTITION" --noheader "$@"
 }
 
 function running_jobs_for_user {
@@ -68,6 +76,7 @@ function main_loop {
         date
         update_jobs "$USERNAME"
         echo
+        SLEEP_DURATION=$((RANDOM % 61 + 30))
         sleep $SLEEP_DURATION
     done
 }
