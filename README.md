@@ -32,7 +32,6 @@ use
 ```bash
 killall autonice_prototype.sh
 ```
-TODO: killall is not available on login-infai.
 
 Running `autonice` under `nohup` leaves behind an empty file called
 `nohup.out`, which you can safely delete when `autonice` is not
