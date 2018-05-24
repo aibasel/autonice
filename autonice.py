@@ -2,6 +2,7 @@
 
 from __future__ import division
 
+import argparse
 import datetime
 import getpass
 import subprocess
@@ -15,26 +16,27 @@ TOTAL_CORES = 384
 SLEEP_DURATION = 300
 
 
-def run_squeue(args):
-    return subprocess.check_output(["squeue", "--partition", "infai", "--noheader"] + args)
+def run_squeue(partition, args):
+    return subprocess.check_output(["squeue", "--partition", partition, "--noheader"] + args)
 
 
-def get_num_running_jobs_for_user(user):
-    jobs = run_squeue(["--states", "RUNNING", "--user", user])
+def get_num_running_jobs_for_user(partition, user):
+    jobs = run_squeue(partition, ["--states", "RUNNING", "--user", user])
     return len(jobs.splitlines())
 
 
-def get_num_pending_users():
-    return len(set(run_squeue(["--states", "PENDING", "-o", "%U"]).splitlines()))
+def get_num_pending_users(partition):
+    return len(set(run_squeue(partition, ["--states", "PENDING", "-o", "%U"]).splitlines()))
 
 
 def job_contains_single_task(jobarrayid):
     return jobarrayid.endswith("_[1]")
 
 
-def set_pending_jobs_nice(user, nice):
+def set_pending_jobs_nice(partition, user, nice):
     # Get jobs for the user, separated by newlines.
-    all_jobs_string = run_squeue(["--states", "PENDING", "--user", user, "-O", "jobarrayid:100"])
+    all_jobs_string = run_squeue(
+        partition, ["--states", "PENDING", "--user", user, "-O", "jobarrayid:100"])
     all_jobs = [job.strip() for job in all_jobs_string.splitlines()]
     print "My pending jobs:", all_jobs
     # Only change nice value for array jobs. Single-task jobs should
@@ -57,13 +59,13 @@ def set_pending_jobs_nice(user, nice):
         print "I have no pending jobs, so no nice values to update."
 
 
-def update_jobs(user):
+def update_jobs(partition, user):
     print "I am {user}".format(**locals())
-    my_cores = get_num_running_jobs_for_user(user)
+    my_cores = get_num_running_jobs_for_user(partition, user)
     print "I am running {my_cores} tasks.".format(**locals())
     print "Hence, I assume I am using {my_cores} cores.".format(**locals())
     print "Under normal circumstances, there should be {TOTAL_CORES} cores.".format(**globals())
-    num_pending_users = get_num_pending_users()
+    num_pending_users = get_num_pending_users(partition)
     print "There are {num_pending_users} users with pending jobs.".format(**locals())
 
     if num_pending_users == 0:
@@ -73,18 +75,31 @@ def update_jobs(user):
         print "My fair share is {fair_share} cores.".format(**locals())
         if my_cores > fair_share:
             print "I am overusing the grid! Let's be nice!"
-            set_pending_jobs_nice(user, HIGH_NICE_VALUE)
+            set_pending_jobs_nice(partition, user, HIGH_NICE_VALUE)
         else:
             print "I am not overusing the grid! No need to be nice!"
-            set_pending_jobs_nice(user, LOW_NICE_VALUE)
+            set_pending_jobs_nice(partition, user, LOW_NICE_VALUE)
+
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "partition",
+        choices=["infai_1", "infai_2", "infai_all"],
+        help="infai_1: 24 nodes with 16 cores and 64GB memory,"
+            " infai_2: 24 nodes with 20 cores and 128GB memory,"
+            " infai_all: combination of infai_1 and infai_2"
+            " (only use infai_all when runtime is irrelevant)""")
+    return parser.parse_args()
 
 
 def main():
     user = getpass.getuser()
+    args = parse_args()
     while True:
         print datetime.datetime.now()
         try:
-            update_jobs(user)
+            update_jobs(args.partition, user)
         except subprocess.CalledProcessError as err:
             # Log error and continue.
             print "Error: {err}".format(**locals())
