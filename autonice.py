@@ -74,7 +74,7 @@ def update_jobs(partition, total_cores, user):
     my_cores = get_num_running_jobs_for_user(partition, user)
     print "I am running {my_cores} tasks.".format(**locals())
     print "Hence, I assume I am using {my_cores} cores.".format(**locals())
-    print "Under normal circumstances, there should be {total_cores} cores.".format(**globals())
+    print "Under normal circumstances, there should be {total_cores} cores.".format(**locals())
     num_pending_users = get_num_pending_users(partition)
     print "There are {num_pending_users} users with pending jobs.".format(**locals())
 
