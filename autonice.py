@@ -5,6 +5,7 @@ from __future__ import division
 import argparse
 import datetime
 import getpass
+import random
 import subprocess
 import sys
 import time
@@ -13,7 +14,6 @@ import time
 # enough to counter-balance 1000 priority points from job age.
 HIGH_NICE_VALUE = 2001
 LOW_NICE_VALUE = 1001
-SLEEP_DURATION = 300
 
 
 def run_squeue(partition, args):
@@ -109,7 +109,7 @@ def main():
             # Log error and continue.
             print "Error: {err}".format(**locals())
         print
-        time.sleep(SLEEP_DURATION)
+        time.sleep(random.randint(30, 90))
 
 
 if __name__ == "__main__":
