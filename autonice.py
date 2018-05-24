@@ -6,13 +6,13 @@ import argparse
 import datetime
 import getpass
 import subprocess
+import sys
 import time
 
 # Ensure that distances between 0, low and high nice values are high
 # enough to counter-balance 1000 priority points from job age.
 HIGH_NICE_VALUE = 2001
 LOW_NICE_VALUE = 1001
-TOTAL_CORES = 384
 SLEEP_DURATION = 300
 
 
@@ -27,6 +27,16 @@ def get_num_running_jobs_for_user(partition, user):
 
 def get_num_pending_users(partition):
     return len(set(run_squeue(partition, ["--states", "PENDING", "-o", "%U"]).splitlines()))
+
+
+def get_num_cores(partition):
+    cmd = ["sinfo", "--partition", partition, "--noheader", "-o", "%C"]
+    output = subprocess.check_output(cmd)
+    parts = output.split("/")
+    try:
+        return int(parts[-1])
+    except ValueError:
+        sys.exit("Error: {cmd} returned unexpected string \"{output}\"".format(**locals()))
 
 
 def job_contains_single_task(jobarrayid):
@@ -59,19 +69,19 @@ def set_pending_jobs_nice(partition, user, nice):
         print "I have no pending jobs, so no nice values to update."
 
 
-def update_jobs(partition, user):
+def update_jobs(partition, total_cores, user):
     print "I am {user}".format(**locals())
     my_cores = get_num_running_jobs_for_user(partition, user)
     print "I am running {my_cores} tasks.".format(**locals())
     print "Hence, I assume I am using {my_cores} cores.".format(**locals())
-    print "Under normal circumstances, there should be {TOTAL_CORES} cores.".format(**globals())
+    print "Under normal circumstances, there should be {total_cores} cores.".format(**globals())
     num_pending_users = get_num_pending_users(partition)
     print "There are {num_pending_users} users with pending jobs.".format(**locals())
 
     if num_pending_users == 0:
         print "Nobody is waiting: how lovely!"
     else:
-        fair_share = TOTAL_CORES / num_pending_users
+        fair_share = total_cores / num_pending_users
         print "My fair share is {fair_share} cores.".format(**locals())
         if my_cores > fair_share:
             print "I am overusing the grid! Let's be nice!"
@@ -83,23 +93,18 @@ def update_jobs(partition, user):
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "partition",
-        choices=["infai_1", "infai_2", "infai_all"],
-        help="infai_1: 24 nodes with 16 cores and 64GB memory,"
-            " infai_2: 24 nodes with 20 cores and 128GB memory,"
-            " infai_all: combination of infai_1 and infai_2"
-            " (only use infai_all when runtime is irrelevant)""")
+    parser.add_argument("partition", choices=["infai_1", "infai_2"])
     return parser.parse_args()
 
 
 def main():
     user = getpass.getuser()
     args = parse_args()
+    total_cores = get_num_cores(args.partition)
     while True:
         print datetime.datetime.now()
         try:
-            update_jobs(args.partition, user)
+            update_jobs(args.partition, total_cores, user)
         except subprocess.CalledProcessError as err:
             # Log error and continue.
             print "Error: {err}".format(**locals())
