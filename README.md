@@ -20,8 +20,9 @@ partition of the Slurm instance at the University of Basel. For
 Start `autonice` in the background with:
 
 ```bash
-nohup ./autonice_prototype.sh --silent &
+nohup ./autonice_prototype.sh <partition> &
 ```
+replacing ```<partition>``` with a slurm partition such as infai_1 or infai_2.
 
 After running this command, log out.
 
