@@ -13,7 +13,7 @@ Priorities are adjusted by setting `nice` values, so `autonice` will
 overwrite all manually set `nice` values.
 
 The current version of `autonice` is hard-coded for use in the `infai_1`
-and `infai_2``partitions of the Slurm instance at the University of
+and `infai_2` partitions of the Slurm instance at the University of
 Basel. For `autonice` to work effectively, every user must run
 `autonice` for all partitions they use.
 
