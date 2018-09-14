@@ -48,13 +48,13 @@ See `notes.org` for some information on known limitations, RFEs etc.
 
 # Version History
 
-* `autonice 0.2` was tagged on TODO. Changes:
-  * Port code from Bash to Python.
-  * Ignore non-array jobs.
-  * Write to stdout instead of hard-coded logfile.
+## autonice 0.2 (September 14, 2018)
+- Port code from Bash to Python.
+- Ignore non-array jobs.
+- Write to stdout instead of hard-coded logfile.
 
-* `autonice 0.1` was tagged on October 17, 2017. It is the first
-  public release of `autonice`.
+## autonice 0.1 (October 17, 2017)
+- First public release of `autonice`.
 
 # License
 
