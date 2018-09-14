@@ -30,9 +30,22 @@ NICE_VALUE_FAIR_USE = 1001
 NICE_VALUE_OVERUSE = 2002
 
 
-def run_squeue(partition, args):
-    return subprocess.check_output(["squeue", "--partition", partition, "--noheader"] + args)
+def log(*args, **kwargs):
+    print(*args, file=log_file, **kwargs)
 
+
+def check_call(*args, **kwargs):
+    log_file.flush()
+    return subprocess.check_call(*args, **kwargs)
+
+
+def check_output(*args, **kwargs):
+    log_file.flush()
+    return subprocess.check_output(*args, **kwargs)
+
+
+def run_squeue(partition, args):
+    return check_output(["squeue", "--partition", partition, "--noheader"] + args)
 
 def get_num_running_jobs_for_user(partition, user):
     jobs = run_squeue(partition, ["--states", "RUNNING", "--user", user])
@@ -45,12 +58,14 @@ def get_num_pending_users(partition):
 
 def get_num_cores(partition):
     cmd = ["sinfo", "--partition", partition, "--noheader", "-o", "%C"]
-    output = subprocess.check_output(cmd)
+    output = check_output(cmd)
     parts = output.split("/")
     try:
         return int(parts[-1])
     except ValueError:
-        sys.exit("Error: {cmd} returned unexpected string \"{output}\"".format(**locals()))
+        msg = "Fatal error: {cmd} returned unexpected string \"{output}\"".format(**locals())
+        log(msg)
+        sys.exit(msg)
 
 
 def job_contains_single_task(jobarrayid):
@@ -64,39 +79,39 @@ def set_pending_array_jobs_nice(partition, user, nice):
     all_jobs_string = run_squeue(
         partition, ["--states", "PENDING", "--user", user, "-O", "jobarrayid:100"])
     all_jobs = [job.strip() for job in all_jobs_string.splitlines()]
-    print("My pending jobs:", all_jobs)
+    log("My pending jobs:", all_jobs)
     # Only change nice value for array jobs. Single-task jobs should
     # always run as soon as they are eligible.
     array_jobs = [job for job in all_jobs if not job_contains_single_task(job)]
-    print("My pending array jobs:", array_jobs)
+    log("My pending array jobs:", array_jobs)
     if array_jobs:
         array_jobs_string = ",".join(array_jobs)
-        print("Setting nice value of jobs {array_jobs_string} to {nice}.".format(**locals()))
-        subprocess.check_call(
+        log("Setting nice value of jobs {array_jobs_string} to {nice}.".format(**locals()))
+        check_call(
             ["scontrol", "update", "jobid={}".format(array_jobs_string), "nice={}".format(nice)])
     else:
-        print("I have no pending jobs, so no nice values to update.")
+        log("I have no pending jobs, so no nice values to update.")
 
 
 def update_jobs(partition, total_cores, user):
-    print("I am {user}".format(**locals()))
+    log("I am {user}".format(**locals()))
     my_cores = get_num_running_jobs_for_user(partition, user)
-    print("I am running {my_cores} tasks.".format(**locals()))
-    print("Hence, I assume I am using {my_cores} cores.".format(**locals()))
-    print("Under normal circumstances, there should be {total_cores} cores.".format(**locals()))
+    log("I am running {my_cores} tasks.".format(**locals()))
+    log("Hence, I assume I am using {my_cores} cores.".format(**locals()))
+    log("Under normal circumstances, there should be {total_cores} cores.".format(**locals()))
     num_pending_users = get_num_pending_users(partition)
-    print("There are {num_pending_users} users with pending jobs.".format(**locals()))
+    log("There are {num_pending_users} users with pending jobs.".format(**locals()))
 
     if num_pending_users == 0:
-        print("Nobody is waiting: how lovely!")
+        log("Nobody is waiting: how lovely!")
     else:
         fair_share = total_cores // num_pending_users
-        print("My fair share is {fair_share} cores.".format(**locals()))
+        log("My fair share is {fair_share} cores.".format(**locals()))
         if my_cores > fair_share:
-            print("I am overusing the grid! Let's be nice!")
+            log("I am overusing the grid! Let's be nice!")
             nice = NICE_VALUE_OVERUSE
         else:
-            print("I am not overusing the grid! No need to be nice!")
+            log("I am not overusing the grid! No need to be nice!")
             nice = NICE_VALUE_FAIR_USE
         set_pending_array_jobs_nice(partition, user, nice)
 
@@ -104,21 +119,26 @@ def update_jobs(partition, total_cores, user):
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("partition", choices=["infai_1", "infai_2"])
+    parser.add_argument("--log-file", type=argparse.FileType("a"),
+                        default=sys.stdout)
     return parser.parse_args()
 
 
 def main():
     user = getpass.getuser()
     args = parse_args()
+    global log_file
+    log_file = args.log_file
     total_cores = get_num_cores(args.partition)
     while True:
-        print(datetime.datetime.now())
+        log(datetime.datetime.now())
         try:
             update_jobs(args.partition, total_cores, user)
         except subprocess.CalledProcessError as err:
             # Log error and continue.
-            print("Error: {err}".format(**locals()))
-        print()
+            log("Error: {err}".format(**locals()))
+        log()
+        log_file.flush()
         time.sleep(random.randint(30, 90))
 
 
