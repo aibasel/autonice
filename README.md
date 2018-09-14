@@ -53,7 +53,7 @@ but of course this is not advisable if you run other Python processes.
 A safer alternative is
 
 ```bash
-ps a | grep autonice
+ps x | grep autonice
 ```
 and then kill just the relevant process IDs.
 
