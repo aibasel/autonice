@@ -22,24 +22,40 @@ Basel. For `autonice` to work effectively, every user must run
 Start `autonice` in the background with:
 
 ```bash
-nohup ./autonice.py <partition> &
+nohup ./autonice.py [--log-file LOG_FILE] <partition> &
 ```
-replacing ```<partition>``` with a Slurm partition such as `infai_1`
-or `infai_2`.
-
-After running this command, log out.
-
-If you want to stop `autonice` later, for example before a restart,
-use
-
-```bash
-killall autonice.py
-```
+replacing ```<partition>``` with a Slurm partition, such as `infai_1`
+and `infai_2`. `autonice` will keep running after you log out.
+For multiple partitions, use multiple invocations of `autonice`.
 
 Running `autonice` under `nohup` redirects all output to a file called
 `nohup.out`, which you can safely delete when `autonice` is not
 running. Deleting the file while `autonice` is running will likely lead
 to quirky behavior of the file system.
+
+# Example
+
+```bash
+nohup ./autonice.py --log-file ~/autonice_infai_1.log infai_1 &
+nohup ./autonice.py --log-file ~/autonice_infai_2.log infai_2 &
+exit
+```
+# Stopping
+
+To stop `autonice`, for example before a restart, a brute-force
+method is
+
+```bash
+killall python
+```
+
+but of course this is not advisable if you run other Python processes.
+A safer alternative is
+
+```bash
+ps a | grep autonice
+```
+and then kill just the relevant process IDs.
 
 # Known Issues
 
@@ -51,7 +67,7 @@ See `notes.org` for some information on known limitations, RFEs etc.
 ## autonice 0.2 (September 14, 2018)
 - Port code from Bash to Python.
 - Ignore non-array jobs.
-- Write to stdout instead of hard-coded logfile.
+- Log file configurable (now defaults to stdout).
 
 ## autonice 0.1 (October 17, 2017)
 - First public release of `autonice`.
