@@ -74,10 +74,10 @@ def job_contains_single_task(jobarrayid):
 
 def set_pending_array_jobs_nice(partition, user, nice):
     # Get jobs for the user, separated by newlines.
-    # We set the field width to 100 because the default of 20 can lead
-    # to truncation for very large array jobs.
+    # %F: Array job ID. For non-array jobs, this is the job ID.
+    # %K: Job array index. By default, the field size is limited to 64 bytes.
     all_jobs_string = run_squeue(
-        partition, ["--states", "PENDING", "--user", user, "-O", "jobarrayid:100"])
+        partition, ["--states", "PENDING", "--user", user, "-o", "%F_[%K]"])
     all_jobs = [job.strip() for job in all_jobs_string.splitlines()]
     log("My pending jobs:", all_jobs)
     # Only change nice value for array jobs. Single-task jobs should
