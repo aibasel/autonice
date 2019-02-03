@@ -73,6 +73,10 @@ See `notes.org` for some information on known limitations, RFEs etc.
 
 # Version History
 
+## autonice 0.x (unreleased)
+- Count the number of used cores instead of running jobs.
+- Use more robust format string for obtaining pending jobs.
+
 ## autonice 0.2 (September 14, 2018)
 - Port code from Bash to Python.
 - Ignore non-array jobs.
