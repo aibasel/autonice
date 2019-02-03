@@ -47,9 +47,16 @@ def check_output(*args, **kwargs):
 def run_squeue(partition, args):
     return check_output(["squeue", "--partition", partition, "--noheader"] + args)
 
+
 def get_num_running_jobs_for_user(partition, user):
     jobs = run_squeue(partition, ["--states", "RUNNING", "--user", user])
     return len(jobs.splitlines())
+
+
+def get_num_used_cores_for_user(partition, user):
+    # %C: Number of cores requested by the job or allocated to it if already running.
+    output = run_squeue(partition, ["--states", "RUNNING", "--user", user, "-o", "%C"])
+    return sum(int(cores) for cores in output.splitlines())
 
 
 def get_num_pending_users(partition):
@@ -95,9 +102,9 @@ def set_pending_array_jobs_nice(partition, user, nice):
 
 def update_jobs(partition, total_cores, user):
     log("I am {user}".format(**locals()))
-    my_cores = get_num_running_jobs_for_user(partition, user)
-    log("I am running {my_cores} tasks.".format(**locals()))
-    log("Hence, I assume I am using {my_cores} cores.".format(**locals()))
+    my_tasks = get_num_running_jobs_for_user(partition, user)
+    my_cores = get_num_used_cores_for_user(partition, user)
+    log("I am running {my_tasks} tasks on {my_cores} cores.".format(**locals()))
     log("Under normal circumstances, there should be {total_cores} cores.".format(**locals()))
     num_pending_users = get_num_pending_users(partition)
     log("There are {num_pending_users} users with pending jobs.".format(**locals()))
