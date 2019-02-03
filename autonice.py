@@ -15,9 +15,6 @@ import time
 Deprioritize all array tasks, and deprioritize them further if we are
 overusing the grid.
 
-Warning: autonice assumes that we only run single-core tasks, otherwise
-its calculations are wrong.
-
 Note that autonice never touches non-array jobs. The rationale for this
 is that our non-array jobs tend to be high priority and only use one
 core, so it is OK to always run them with high priority.

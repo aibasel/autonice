@@ -57,6 +57,15 @@ ps x | grep autonice
 ```
 and then kill just the relevant process IDs.
 
+# Reserving memory
+
+You can set the amount of memory `sbatch` allocates to each core with
+the `--mem-per-cpu` option. (Note that `cpu` refers to a core/processor
+in Slurm parameter strings.) Autonice assumes that you only allocate as
+much memory as is available per core. This is `3872M` on `infai_1` and
+`6354M` on `infai_2`. If you need more memory, you must allocate
+multiple cores to each task by using the `--cpus-per-task` option.
+
 # Known Issues
 
 Many. The current version of `autonice` is very much a prototype.
