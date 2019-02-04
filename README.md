@@ -57,12 +57,25 @@ ps x | grep autonice
 ```
 and then kill just the relevant process IDs.
 
+# Reserving memory
+
+You can set the amount of memory `sbatch` allocates to each core with
+the `--mem-per-cpu` option. (Note that `cpu` refers to a core/processor
+in Slurm parameter strings.) Autonice assumes that you only allocate as
+much memory as is available per core. This is `3872M` on `infai_1` and
+`6354M` on `infai_2`. If you need more memory, you must allocate
+multiple cores to each task by using the `--cpus-per-task` option.
+
 # Known Issues
 
 Many. The current version of `autonice` is very much a prototype.
 See `notes.org` for some information on known limitations, RFEs etc.
 
 # Version History
+
+## autonice 0.x (unreleased)
+- Count the number of used cores instead of running jobs.
+- Use more robust format string for obtaining pending jobs.
 
 ## autonice 0.2 (September 14, 2018)
 - Port code from Bash to Python.

@@ -4,14 +4,6 @@ I'm not sure how diligent I'll be in updating the status of fixed
 bugs etc., so the dates associated with each entry might be an
 indication of how likely a given entry is to be out of date. ;-)
 
-16.11.2018:
-- Autonice currently doesn't handle multi-core jobs fairly. (See
-  docstring in autonice.py.) It assumes that each task uses exactly
-  one core. If a task uses more than one core, autonice will falsely
-  count this as using a single task and let the corresponding user
-  overuse the grid. This situation happens for example when a task
-  reserves more memory than is available for a single core.
-
 10.11.2018:
 - Autonice doesn't support the infai_all queue. Jobs submitted to
   the infai_all queue are not taken into account when computing the
