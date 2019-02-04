@@ -66,6 +66,13 @@ much memory as is available per core. This is `3872M` on `infai_1` and
 `6354M` on `infai_2`. If you need more memory, you must allocate
 multiple cores to each task by using the `--cpus-per-task` option.
 
+# Ordering jobs
+
+To let Slurm run job 123 before job 456, you can use the command
+`scontrol update dependency=123 jobid=456`. This is useful to order your
+own jobs, but also if you want to let someone else's jobs finish before
+yours start.
+
 # Known Issues
 
 Many. The current version of `autonice` is very much a prototype.
