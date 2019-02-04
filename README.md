@@ -80,7 +80,7 @@ See `notes.org` for some information on known limitations, RFEs etc.
 
 # Version History
 
-## autonice 0.x (unreleased)
+## autonice 0.3 (January 4, 2019)
 - Count the number of used cores instead of running jobs.
 - Use more robust format string for obtaining pending jobs.
 
