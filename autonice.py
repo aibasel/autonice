@@ -4,6 +4,7 @@ from __future__ import division
 from __future__ import print_function
 
 import argparse
+import collections
 import datetime
 import getpass
 import random
@@ -27,6 +28,9 @@ NICE_VALUE_FAIR_USE = 1001
 NICE_VALUE_OVERUSE = 2002
 
 
+Usage = collections.namedtuple('Usage', ['cores', 'tasks'])
+
+
 def log(*args, **kwargs):
     print(*args, file=log_file, **kwargs)
 
@@ -45,10 +49,10 @@ def run_squeue(partition, args):
     return check_output(["squeue", "--partition", partition, "--noheader"] + args)
 
 
-def get_num_used_cores_for_user(partition, user):
+def get_usage_for_user(partition, user):
     # %C: Number of cores requested by the job or allocated to it if already running.
-    output = run_squeue(partition, ["--states", "RUNNING", "--user", user, "-o", "%C"])
-    return sum(int(cores) for cores in output.splitlines())
+    lines = run_squeue(partition, ["--states", "RUNNING", "--user", user, "-o", "%C"]).splitlines()
+    return Usage(cores=sum(int(cores) for cores in lines), tasks=len(lines))
 
 
 def get_num_pending_users(partition):
@@ -94,8 +98,8 @@ def set_pending_array_jobs_nice(partition, user, nice):
 
 def update_jobs(partition, total_cores, user):
     log("I am {user}".format(**locals()))
-    my_cores = get_num_used_cores_for_user(partition, user)
-    log("I am using {my_cores} cores.".format(**locals()))
+    my_usage = get_usage_for_user(partition, user)
+    log("I am running {0.tasks} tasks on {0.cores} cores.".format(my_usage))
     log("Under normal circumstances, there should be {total_cores} cores.".format(**locals()))
     num_pending_users = get_num_pending_users(partition)
     log("There are {num_pending_users} users with pending jobs.".format(**locals()))
@@ -105,7 +109,7 @@ def update_jobs(partition, total_cores, user):
     else:
         fair_share = total_cores // num_pending_users
         log("My fair share is {fair_share} cores.".format(**locals()))
-        if my_cores > fair_share:
+        if my_usage.cores > fair_share:
             log("I am overusing the grid! Let's be nice!")
             nice = NICE_VALUE_OVERUSE
         else:
