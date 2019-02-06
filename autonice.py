@@ -93,7 +93,7 @@ def set_pending_array_jobs_nice(partition, user, nice):
         check_call(
             ["scontrol", "update", "jobid={}".format(array_jobs_string), "nice={}".format(nice)])
     else:
-        log("I have no pending jobs, so no nice values to update.")
+        log("I have no pending array jobs, so no nice values to update.")
 
 
 def update_jobs(partition, total_cores, user):
