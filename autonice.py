@@ -72,13 +72,14 @@ def get_num_cores(partition):
 
 
 def job_contains_single_task(jobarrayid):
-    return jobarrayid.endswith("_[1]")
+    return jobarrayid.endswith("_[1]") or jobarrayid.endswith("_[N/A]")
 
 
 def set_pending_array_jobs_nice(partition, user, nice):
     # Get jobs for the user, separated by newlines.
     # %F: Array job ID. For non-array jobs, this is the job ID.
-    # %K: Job array index. By default, the field size is limited to 64 bytes.
+    # %K: Job array index. For non-array jobs, this is "N/A". By default,
+    #     the field size is limited to 64 bytes.
     all_jobs_string = run_squeue(
         partition, ["--states", "PENDING", "--user", user, "-o", "%F_[%K]"])
     all_jobs = [job.strip() for job in all_jobs_string.splitlines()]
