@@ -80,6 +80,9 @@ See `notes.org` for some information on known limitations, RFEs etc.
 
 # Version History
 
+## autonice 0.x (unreleased)
+- Ignore non-array jobs.
+
 ## autonice 0.3 (February 4, 2019)
 - Count the number of used cores instead of running jobs.
 - Use more robust format string for obtaining pending jobs.
