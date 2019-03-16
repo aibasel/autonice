@@ -80,7 +80,7 @@ See `notes.org` for some information on known limitations, RFEs etc.
 
 # Version History
 
-## autonice 0.x (unreleased)
+## autonice 0.4 (March 16, 2019)
 - Ignore non-array jobs.
 
 ## autonice 0.3 (February 4, 2019)
