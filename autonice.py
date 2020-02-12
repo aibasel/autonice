@@ -42,7 +42,7 @@ def check_call(*args, **kwargs):
 
 def check_output(*args, **kwargs):
     log_file.flush()
-    return subprocess.check_output(*args, **kwargs)
+    return subprocess.check_output(*args, **kwargs).decode("utf-8")
 
 
 def run_squeue(partition, args):
