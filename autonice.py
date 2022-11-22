@@ -60,7 +60,7 @@ def get_num_pending_users(partition):
 
 
 def get_num_cores(partition):
-    cmd = ["sinfo", "--partition", partition, "--noheader", "-o", "%C"]
+    cmd = ["sinfo", "--partition", partition, "--noheader", "-r", "-o", "%C"]
     output = check_output(cmd)
     parts = output.split("/")
     try:
