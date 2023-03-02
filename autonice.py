@@ -121,7 +121,7 @@ def update_jobs(partition, total_cores, user):
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("partition", choices=["infai_1", "infai_2"])
+    parser.add_argument("partition", choices=["infai_1", "infai_2", "infai_3"])
     parser.add_argument("--log-file", type=argparse.FileType("a"),
                         default=sys.stdout)
     return parser.parse_args()
