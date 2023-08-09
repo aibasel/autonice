@@ -13,9 +13,9 @@ Priorities are adjusted by setting `nice` values, so `autonice` will
 overwrite all manually set `nice` values.
 
 The current version of `autonice` is hard-coded for use in the `infai_1`
-and `infai_2` partitions of the Slurm instance at the University of
-Basel. For `autonice` to work effectively, every user must run
-`autonice` for all partitions they use.
+, `infai_2` and `infai_3` partitions of the Slurm instance at the 
+University of Basel. For `autonice` to work effectively, every user must
+run `autonice` for all partitions they use.
 
 # Usage
 
@@ -24,8 +24,8 @@ Start `autonice` in the background with:
 ```bash
 nohup ./autonice.py [--log-file LOG_FILE] <partition> &
 ```
-replacing ```<partition>``` with a Slurm partition, such as `infai_1`
-and `infai_2`. `autonice` will keep running after you log out.
+replacing ```<partition>``` with a Slurm partition, such as `infai_1`, 
+`infai_2` and `infai_3`. `autonice` will keep running after you log out.
 For multiple partitions, use multiple invocations of `autonice`.
 
 Running `autonice` under `nohup` redirects all output to a file called
@@ -38,6 +38,7 @@ to quirky behavior of the file system.
 ```bash
 nohup ./autonice.py --log-file ~/autonice_infai_1.log infai_1 &
 nohup ./autonice.py --log-file ~/autonice_infai_2.log infai_2 &
+nohup ./autonice.py --log-file ~/autonice_infai_3.log infai_3 &
 exit
 ```
 # Stopping
@@ -62,9 +63,10 @@ and then kill just the relevant process IDs.
 You can set the amount of memory `sbatch` allocates to each core with
 the `--mem-per-cpu` option. (Note that `cpu` refers to a core/processor
 in Slurm parameter strings.) Autonice assumes that you only allocate as
-much memory as is available per core. This is `3872M` on `infai_1` and
-`6354M` on `infai_2`. If you need more memory, you must allocate
-multiple cores to each task by using the `--cpus-per-task` option.
+much memory as is available per core. This is `3872M` on `infai_1`, 
+`6354M` on `infai_2` and `4028M` on `infai_3`. If you need more memory,
+you must allocate multiple cores to each task by using the 
+`--cpus-per-task` option.
 
 # Ordering jobs
 
